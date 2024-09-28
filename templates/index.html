@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            height: 100vh;
+        }
+        .container {
+            height: 100%;
+            margin-top: 2rem;
+        }
+        .form-container, .links-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            height: 480px; /* Fixed height for both form and links */
+            overflow-y: auto;
+        }
+        .form-container {
+            position: sticky;
+            top: 0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .alert-success a {
+            color: #155724;
+            font-weight: bold;
+        }
+        .list-group-item a {
+            color: #007bff;
+        }
+        .list-group-item a:hover {
+            text-decoration: underline;
+        }
+        .links-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .links-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        .links-header a {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <div class="row">
+            <!-- Form Container -->
+            <div class="col-md-6 form-container">
+                <h2>Shorten a URL</h2>
+                <form action="/shorten" method="POST">
+                    <div class="form-group">
+                        <label for="url">Enter a URL:</label>
+                        <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Give it a name (optional):</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="e.g. My Google Link">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiry">Set Expiration Time:</label>
+                        <select class="form-control" id="expiry" name="expiry">
+                            <option value="7">7 Days</option>
+                            <option value="30">30 Days</option>
+                            <option value="45">45 Days</option>
+                            <option value="never">Never Expire</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Shorten URL</button>
+                </form>
+
+                <!-- Display Shortened URL if present -->
+                {% if short_url %}
+                <div class="alert alert-success mt-3">
+                    Shortened URL: <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Links Container -->
+            <div class="col-md-6 links-container">
+                <div class="links-header">
+                    <h3>Last 3 Shortened URLs</h3>
+                    <a href="/all-links" class="btn btn-info">Show All Links</a>
+                </div>
+
+                {% if last_links %}
+                <ul class="list-group mt-3">
+                    {% for link in last_links[:3] %}  <!-- Show only the last 3 links -->
+                    <li class="list-group-item">
+                        <div>
+                            <strong>{{ link.name or 'Unnamed' }}</strong><br>
+                            <strong>Short URL:</strong> 
+                            <a href="{{ link.short_code }}" target="_blank">{{ request.host_url }}{{ link.short_code }}</a><br>
+                            <strong>Original URL:</strong> 
+                            <a href="{{ link.long_url }}" target="_blank">{{ link.long_url }}</a>
+                        </div>
+                        <form action="/delete/{{ link.short_code }}" method="POST" style="display: inline;">
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this link?')">Delete</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-info mt-3">
+                    No shortened URLs available yet. Your last 3 shortened URLs will appear here.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

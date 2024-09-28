@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Shortened URLs</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .container {
+            margin-top: 2rem;
+        }
+        .list-group-item a {
+            color: #007bff;
+        }
+        .list-group-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="container mt-5">
+    <h1 class="text-center">All Shortened URLs</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <ul class="list-group">
+                {% for link in all_links %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ link.name or 'Unnamed' }}</strong><br>
+                        <strong>Short URL:</strong> 
+                        <a href="{{ link.short_code }}" target="_blank">{{ request.host_url }}{{ link.short_code }}</a><br>
+                        <strong>Original URL:</strong> 
+                        <a href="{{ link.long_url }}" target="_blank">{{ link.long_url }}</a>
+                    </div>
+                    <form action="/delete/{{ link.short_code }}" method="POST" style="display: inline;">
+                        <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this link?')">Delete</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="/" class="btn btn-secondary btn-block mt-3">Go Back</a>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
